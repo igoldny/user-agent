@@ -1,4 +1,4 @@
-class UserAgent
+class window.UserAgentParser
 
   Versions =
     Firefox       : /firefox\/([\d\w\.\-]+)/i
@@ -18,7 +18,7 @@ class UserAgent
     PSP           : /playstation portable/i
     Firefox       : /firefox/i
 
-  OS = 
+  OS =
     WindowsVista  : /windows nt 6\.0/i
     Windows7      : /windows nt 6\.\d+/i
     Windows2003   : /windows nt 5\.2/i
@@ -32,7 +32,7 @@ class UserAgent
     Ipad          : /\(iPad.*os (\d+)[._](\d+)/i
     Iphone        : /\(iPhone.*os (\d+)[._](\d+)/i
 
-  Platform = 
+  Platform =
     Windows       : /windows/i
     Mac           : /macintosh/i
     Linux         : /linux/i
@@ -44,6 +44,8 @@ class UserAgent
     Android       : /android/i
     Blackberry    : /blackberry/i
 
+  Type =
+    Mobile       : /Mobile/i
 
   constructor: (source = navigator.userAgent) ->
     @source           = source.replace(/^\s*/, '').replace(/\s*$/, '')
@@ -51,7 +53,14 @@ class UserAgent
     @browser_version  = browser_version @source
     @os               = os @source
     @platform         = platform @source
-  
+    @type             = type @source
+    @mobile           = @type is 'mobile'
+
+    html = document.getElementsByTagName('html')[0]
+    html.className += ' ' + @browser_name
+    html.className += ' ' + @platform
+    html.className += ' ' + @type
+
   browser_name = (string)->
     switch true
       when Browsers.Konqueror.test string  then 'konqueror'
@@ -63,7 +72,7 @@ class UserAgent
       when Browsers.PSP.test string        then 'psp'
       when Browsers.Firefox.test string    then 'firefox'
       else 'unknown'
-  
+
 
   browser_version = (string)->
     switch browser_name(string)
@@ -74,7 +83,7 @@ class UserAgent
       when 'firefox'
         RegExp.$1 if Versions.Firefox.test string
       when 'ie'
-        RegExp.$1 if Versions.IE.test string        
+        RegExp.$1 if Versions.IE.test string
       when 'ps3'
         RegExp.$1 if Versions.Ps3.test string
       when 'psp'
@@ -86,15 +95,15 @@ class UserAgent
 
   os = (string)->
     switch true
-      when OS.WindowsVista.test string then 'Windows Vista'
-      when OS.Windows7.test string     then 'Windows 7'
-      when OS.Windows2003.test string  then 'Windows 2003'
-      when OS.WindowsXP.test string    then 'Windows XP'
-      when OS.Windows2000.test string  then 'Windows 2000'
-      when OS.Linux.test string        then 'Linux'
-      when OS.Wii.test string          then 'Wii'
-      when OS.PS3.test string          then 'Playstation'
-      when OS.PSP.test string          then 'Playstation'
+      when OS.WindowsVista.test string then 'windows vista'
+      when OS.Windows7.test string     then 'windows 7'
+      when OS.Windows2003.test string  then 'windows 2003'
+      when OS.WindowsXP.test string    then 'windows XP'
+      when OS.Windows2000.test string  then 'windows 2000'
+      when OS.Linux.test string        then 'linux'
+      when OS.Wii.test string          then 'wii'
+      when OS.PS3.test string          then 'playstation'
+      when OS.PSP.test string          then 'playstation'
       when OS.OSX.test string          then string.match(OS.OSX)[0].replace('_','.')
       when OS.Ipad.test string         then string.match(OS.Ipad)[0].replace('_','.')
       when OS.Iphone.test string       then string.match(OS.Iphone)[0].replace('_','.')
@@ -102,14 +111,21 @@ class UserAgent
 
   platform = (string)->
     switch true
-      when Platform.Windows.test string     then "Microsoft Windows"
-      when Platform.Mac.test string         then "Apple Mac"
-      when Platform.Android.test string     then "Android"
-      when Platform.Blackberry.test string  then "Blackberry"
-      when Platform.Linux.test string       then "Linux"
-      when Platform.Wii.test string         then "Wii"
-      when Platform.Playstation.test string then "Playstation"
-      when Platform.Ipad.test string        then "iPad"
-      when Platform.Ipod.test string        then "iPod"
-      when Platform.Iphone.test string      then "iPhone"
+      when Platform.Windows.test string     then "windows"
+      when Platform.Mac.test string         then "mac"
+      when Platform.Android.test string     then "android"
+      when Platform.Blackberry.test string  then "blackberry"
+      when Platform.Linux.test string       then "linux"
+      when Platform.Wii.test string         then "wii"
+      when Platform.Playstation.test string then "playstation"
+      when Platform.Ipad.test string        then "ipad"
+      when Platform.Ipod.test string        then "ipod"
+      when Platform.Iphone.test string      then "iphone"
       else 'unknown'
+
+  type = (string)->
+    switch true
+      when Type.Mobile.test string     then "mobile"
+      else 'desktop'
+
+window.userAgent = new window.UserAgentParser
